@@ -1,0 +1,36 @@
+# Node dependencies
+**/node_modules/
+**/package-lock.json
+
+# Build outputs
+frontend/build/
+frontend/dist/
+backend/dist/
+
+# Environment variables
+**/.env
+
+# Log files
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# VSCode settings
+.vscode/
+
+# Uploaded files
+backend/uploads/
+
+# Cache and temporary files
+*.tmp
+*.swp
+*.swo
+.cache/
+
+# Test coverage
+coverage/
+
+# Firebase (if deprecated, still ignore)
+frontend/src/firebase.js

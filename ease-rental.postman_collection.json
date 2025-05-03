@@ -1,0 +1,64 @@
+{
+	"info": {
+		"_postman_id": "15030f10-2196-4101-a94d-b9bbe7efd2e2",
+		"name": "ease-rental",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38364712"
+	},
+	"item": [
+		{
+			"name": "signup",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "signin",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "create-listing",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Dynamic Listing1\",\n  \"description\": \"Uploaded via Postman1\",\n  \"address\": \"123 Test St1\",\n  \"regularPrice\": 1000221,\n  \"discountPrice\": 900221,\n  \"bathrooms\": 1221,\n  \"bedrooms\": 221,\n  \"furnished\": true,\n  \"parking\": true,\n  \"type\": \"rent\",\n  \"offer\": false,\n  \"imageUrls\": [\"uploadedImageUrls\", \"img\", \"img2\"],\n  \"userRef\": \"680bac7d16d3654e7f2b6699\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/listing/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"listing",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
