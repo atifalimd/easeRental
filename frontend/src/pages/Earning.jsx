@@ -16,6 +16,7 @@ export default function Earnings() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            // hello
           },
         });
 
