@@ -12,6 +12,8 @@ import Search from "./pages/Search";
 import Earnings from "./pages/Earning";
 import ActiveListings from "./pages/ActiveListing";
 import PendingRequests from "./pages/PendingList";
+import PreferencesPage from "./pages/Prefer";
+import RentalHistory from "./pages/RentalHistory";
 
 export default function App() {
   return (
@@ -30,6 +32,9 @@ export default function App() {
           <Route path="/get-active-listing" element={<ActiveListings />} />
           <Route path="/get-pending-requests" element={<PendingRequests />} />
           <Route path="/create-listing" element={<CreateListing />} />
+          <Route path="/tenant/preferences" element={<PreferencesPage />} />
+          <Route path="rentals/history" element={<RentalHistory />} />
+
           <Route
             path="/update-listing/:listingId"
             element={<UpdateListing />}

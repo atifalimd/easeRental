@@ -43,15 +43,63 @@ export const uploadImages = [
   },
 ];
 
+// export const createListing = async (req, res, next) => {
+//   try {
+//     const listing = await Listing.create({
+//       ...req.body,
+//       userRef: req.user.id,
+//     });
+//     return res.status(201).json(listing);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const createListing = async (req, res, next) => {
   try {
-    const listing = await Listing.create({
-      ...req.body,
-      userRef: req.user.id,
+    console.log("Create listing request body:", req.body);
+
+    if (!req.body.userRef) {
+      return res.status(400).json({
+        success: false,
+        message: "User reference (userRef) is required",
+      });
+    }
+
+    const listing = await Listing.create(req.body);
+
+    if (!listing || !listing._id) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create listing properly",
+      });
+    }
+
+    console.log("Created listing:", listing);
+
+    return res.status(201).json({
+      success: true,
+      _id: listing._id,
+      ...listing._doc,
     });
-    return res.status(201).json(listing);
   } catch (error) {
-    next(error);
+    console.error("Create listing error:", error);
+
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: validationErrors,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -102,6 +150,7 @@ export const getListing = async (req, res, next) => {
     if (!listing) {
       return next(errorHandler(404, "Listing not found!"));
     }
+
     res.status(200).json(listing);
   } catch (error) {
     next(error);

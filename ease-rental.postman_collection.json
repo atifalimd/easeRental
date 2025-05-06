@@ -25,11 +25,21 @@
 		{
 			"name": "create-listing",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MTNhM2MyMDA4YTM3NGVlMDk2MjcwZCIsInJvbGUiOiJsYW5kbG9yZCIsImlhdCI6MTc0NjExODEwNH0.NCPNOF_MHYVAmQje0czLBE_oYOhsY7hwiOtGoZmfPNY",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\": \"Dynamic Listing1\",\n  \"description\": \"Uploaded via Postman1\",\n  \"address\": \"123 Test St1\",\n  \"regularPrice\": 1000221,\n  \"discountPrice\": 900221,\n  \"bathrooms\": 1221,\n  \"bedrooms\": 221,\n  \"furnished\": true,\n  \"parking\": true,\n  \"type\": \"rent\",\n  \"offer\": false,\n  \"imageUrls\": [\"uploadedImageUrls\", \"img\", \"img2\"],\n  \"userRef\": \"680bac7d16d3654e7f2b6699\"\n}",
+					"raw": "{\n  \"name\": \"Bottle pending-1\",\n  \"description\": \"Uploaded via Postman4\",\n  \"address\": \"123 St\",\n  \"regularPrice\": 1000,\n  \"discountPrice\": 900,\n  \"bathrooms\": 1,\n  \"bedrooms\": 2,\n  \"furnished\": true,\n  \"parking\": true,\n  \"type\": \"rent\",\n  \"status\":\"pending\",\n  \"offer\": false,\n  \"imageUrls\": [\"uploadedImageUrls\", \"img\", \"img2\"],\n  \"userRef\": \"680eb9c58b7275d4b3ab207c\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -53,7 +63,142 @@
 			"response": []
 		},
 		{
-			"name": "New Request",
+			"name": "get-user-listing",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "delete-user-listing",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "update-listing",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "search",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get-active-listing",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/get-active-listing",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"get-active-listing"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-pending-listing",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "CreateActiveListings",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Modern 2BHK Apartment\",\n  \"description\": \"Partly furnished\",\n  \"price\": 1200\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/active-listing",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"active-listing"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createPendingListing",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get-earning",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MTNhM2MyMDA4YTM3NGVlMDk2MjcwZCIsInJvbGUiOiJsYW5kbG9yZCIsImlhdCI6MTc0NjExODEwNH0.NCPNOF_MHYVAmQje0czLBE_oYOhsY7hwiOtGoZmfPNY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/get-earnings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"get-earnings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "account-details",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "landlord",
 			"request": {
 				"method": "GET",
 				"header": []

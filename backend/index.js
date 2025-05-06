@@ -9,6 +9,9 @@ import userRouter from "./routes/user-route.js";
 import authRouter from "./routes/auth-route.js";
 import listingRouter from "./routes/listing-route.js";
 import dashboardRoutes from "./routes/dashboard-route.js";
+import TenantPreferenceRoute from "./routes/tenant-pref-route.js";
+import rentalRoutes from "./routes/rental-history-route.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
@@ -45,6 +48,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 app.use("/uploads", express.static("uploads"));
 app.use("/api", dashboardRoutes);
+app.use("/api/tenant", TenantPreferenceRoute);
+app.use("/api/rentals", rentalRoutes);
 
 import multer from "multer";
 const storage = multer.diskStorage({

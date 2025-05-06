@@ -7,7 +7,7 @@ export default function CreateListing() {
   const token = currentUser?.access_token;
 
   const navigate = useNavigate();
-  console.log(currentUser._id);
+  console.log(currentUser.user._id);
 
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
@@ -28,6 +28,19 @@ export default function CreateListing() {
   const [loading, setLoading] = useState(false);
 
   const handleImageSubmit = async (images) => {
+    if (!images || images.length === 0) {
+      setImageUploadError("Please select at least one image");
+      return;
+    }
+
+    if (images.length > 6) {
+      setImageUploadError("You can only upload up to 6 images");
+      return;
+    }
+
+    setUploading(true);
+    setImageUploadError(null);
+
     const formDataData = new FormData();
     for (let i = 0; i < images.length; i++) {
       formDataData.append("images", images[i]);
@@ -42,20 +55,45 @@ export default function CreateListing() {
         }
       );
 
-      if (!res.ok) throw new Error("Image upload failed");
+      // if (!res.ok) throw new Error("Image upload failed");
+
+      if (!res.ok) {
+        setImageUploadError(data.error || "Image upload failed");
+        setUploading(false);
+        return;
+      }
 
       const data = await res.json();
       console.log("Uploaded image URLs:", data.imageUrls);
 
-      setFormData((prev) => ({
-        ...prev,
-        imageUrls: [
+      // setFormData((prev) => ({
+      //   ...prev,
+      //   imageUrls: [
+      //     ...prev.imageUrls,
+      //     ...data.imageUrls.map((url) => `http://localhost:3000${url}`),
+      //   ],
+      // }));
+
+      setFormData((prev) => {
+        const updatedImageUrls = [
           ...prev.imageUrls,
           ...data.imageUrls.map((url) => `http://localhost:3000${url}`),
-        ],
-      }));
+        ];
+        setUploading(false);
+        setFiles([]);
+
+        // Log the updated formData after adding the image URLs
+        console.log("Updated formData with image URLs:", updatedImageUrls);
+
+        return {
+          ...prev,
+          imageUrls: updatedImageUrls,
+        };
+      });
     } catch (error) {
       console.error("Upload error:", error.message);
+      setImageUploadError("Failed to upload images.");
+      setUploading(false);
     }
   };
 
@@ -103,13 +141,12 @@ export default function CreateListing() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        // credentials: "include",
         body: JSON.stringify({
           ...formData,
           userRef: currentUser.user._id,
         }),
       });
-      console.log("Creating listing with userRef:", currentUser._id);
+      console.log("Creating listing with userRef:", currentUser.user._id);
 
       const data = await res.json();
 

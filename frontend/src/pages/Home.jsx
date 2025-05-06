@@ -1,155 +1,69 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import SwiperCore from "swiper";
-import "swiper/css/bundle";
 import ListingItem from "../components/ListingItem";
 
 export default function Home() {
-  const [offerListings, setOfferListings] = useState([]);
-  const [saleListings, setSaleListings] = useState([]);
   const [rentListings, setRentListings] = useState([]);
-  SwiperCore.use([Navigation]);
-  console.log(offerListings);
+
   useEffect(() => {
-    const fetchOfferListings = async () => {
-      try {
-        const res = await fetch("/api/listing/get?offer=true&limit=4");
-        const data = await res.json();
-        setOfferListings(data);
-        fetchRentListings();
-      } catch (error) {
-        console.log(error);
-      }
-    };
     const fetchRentListings = async () => {
       try {
         const res = await fetch("/api/listing/get?type=rent&limit=4");
         const data = await res.json();
         setRentListings(data);
-        fetchSaleListings();
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching rent listings:", error);
       }
     };
 
-    const fetchSaleListings = async () => {
-      try {
-        const res = await fetch("/api/listing/get?type=sale&limit=4");
-        const data = await res.json();
-        setSaleListings(data);
-      } catch (error) {
-        log(error);
-      }
-    };
-    fetchOfferListings();
+    fetchRentListings();
   }, []);
+
   return (
-    <div>
-      {/* top */}
-      <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
-        <h1 className="text-slate-700 font-bold text-3xl lg:text-6xl">
-          Find your next <span className="text-slate-500">perfect</span>
-          <br />
-          place with ease
-        </h1>
-        <div className="text-gray-400 text-xs sm:text-sm">
-          Sahand Estate is the best place to find your next perfect place to
-          live.
-          <br />
-          We have a wide range of properties for you to choose from.
+    <div className="bg-gray-50 min-h-screen">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-blue-100 to-indigo-200 py-20 px-4 sm:px-10 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl sm:text-6xl font-extrabold text-gray-800 leading-tight mb-6">
+            Discover Your <span className="text-indigo-600">Dream Home</span>
+            <br />
+            with <span className="text-blue-600">Zero Hassle</span>
+          </h1>
+          <p className="text-gray-600 text-base sm:text-lg mb-6">
+            From cozy apartments to luxury estates — browse verified listings
+            tailored to your lifestyle. Start your next chapter today.
+          </p>
+
+          <Link
+            to="/search"
+            className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-indigo-700 shadow-md transition"
+          >
+            Browse Properties
+          </Link>
         </div>
-        <Link
-          to={"/search"}
-          className="text-xs sm:text-sm text-blue-800 font-bold hover:underline"
-        >
-          Let's get started...
-        </Link>
-      </div>
+      </section>
 
-      {/* swiper */}
-      <Swiper navigation>
-        {offerListings &&
-          offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            <SwiperSlide>
-              <div
-                style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: "cover",
-                }}
-                className="h-[500px]"
-                key={listing._id}
-              ></div>
-            </SwiperSlide>
-          ))}
-      </Swiper>
-
-      {/* listing results for offer, sale and rent */}
-
-      <div className="max-w-6xl mx-auto p-3 flex flex-col gap-8 my-10">
-        {offerListings && offerListings.length > 0 && (
-          <div className="">
-            <div className="my-3">
-              <h2 className="text-2xl font-semibold text-slate-600">
-                Recent offers
-              </h2>
+      {/* Rent Listings Section */}
+      <section className="max-w-7xl mx-auto px-4 py-10">
+        {rentListings.length > 0 && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">For Rent</h2>
               <Link
-                className="text-sm text-blue-800 hover:underline"
-                to={"/search?offer=true"}
+                to="/search?type=rent"
+                className="text-indigo-600 text-sm hover:underline"
               >
-                Show more offers
+                Explore Rentals
               </Link>
             </div>
-            <div className="flex flex-wrap gap-4">
-              {offerListings.map((listing) => (
-                <ListingItem listing={listing} key={listing._id} />
-              ))}
-            </div>
-          </div>
-        )}
-        {rentListings && rentListings.length > 0 && (
-          <div className="">
-            <div className="my-3">
-              <h2 className="text-2xl font-semibold text-slate-600">
-                Recent places for rent
-              </h2>
-              <Link
-                className="text-sm text-blue-800 hover:underline"
-                to={"/search?type=rent"}
-              >
-                Show more places for rent
-              </Link>
-            </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {rentListings.map((listing) => (
-                <ListingItem listing={listing} key={listing._id} />
+                <ListingItem key={listing._id} listing={listing} />
               ))}
             </div>
           </div>
         )}
-        {saleListings && saleListings.length > 0 && (
-          <div className="">
-            <div className="my-3">
-              <h2 className="text-2xl font-semibold text-slate-600">
-                Recent places for sale
-              </h2>
-              <Link
-                className="text-sm text-blue-800 hover:underline"
-                to={"/search?type=sale"}
-              >
-                Show more places for sale
-              </Link>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              {saleListings.map((listing) => (
-                <ListingItem listing={listing} key={listing._id} />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      </section>
     </div>
   );
 }
