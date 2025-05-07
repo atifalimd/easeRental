@@ -27,6 +27,11 @@ export default function CreateListing() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const getImageUrl = (url) => {
+    if (!url) return "";
+    return url.startsWith("http") ? url : `http://localhost:3000${url}`;
+  };
+
   const handleImageSubmit = async (images) => {
     if (!images || images.length === 0) {
       setImageUploadError("Please select at least one image");
@@ -55,7 +60,8 @@ export default function CreateListing() {
         }
       );
 
-      // if (!res.ok) throw new Error("Image upload failed");
+      const data = await res.json();
+      console.log("Uploaded image URLs:", data.imageUrls);
 
       if (!res.ok) {
         setImageUploadError(data.error || "Image upload failed");
@@ -63,27 +69,14 @@ export default function CreateListing() {
         return;
       }
 
-      const data = await res.json();
-      console.log("Uploaded image URLs:", data.imageUrls);
-
-      // setFormData((prev) => ({
-      //   ...prev,
-      //   imageUrls: [
-      //     ...prev.imageUrls,
-      //     ...data.imageUrls.map((url) => `http://localhost:3000${url}`),
-      //   ],
-      // }));
-
+      // Store the URLs as they are returned from the server
       setFormData((prev) => {
-        const updatedImageUrls = [
-          ...prev.imageUrls,
-          ...data.imageUrls.map((url) => `http://localhost:3000${url}`),
-        ];
+        const updatedImageUrls = [...prev.imageUrls, ...data.imageUrls];
+
+        console.log("Updated formData with image URLs:", updatedImageUrls);
+
         setUploading(false);
         setFiles([]);
-
-        // Log the updated formData after adding the image URLs
-        console.log("Updated formData with image URLs:", updatedImageUrls);
 
         return {
           ...prev,
@@ -107,7 +100,13 @@ export default function CreateListing() {
   const handleChange = (e) => {
     const { id, type, value, checked } = e.target;
 
-    if (type === "checkbox") {
+    if (id === "sale" || id === "rent") {
+      // Handle property type (sale/rent) radio buttons
+      setFormData({
+        ...formData,
+        type: id,
+      });
+    } else if (type === "checkbox") {
       setFormData((prev) => ({
         ...prev,
         [id]: checked,
@@ -143,6 +142,8 @@ export default function CreateListing() {
         },
         body: JSON.stringify({
           ...formData,
+          // The backend should use the token to identify the user
+          // but we'll include userRef for backward compatibility
           userRef: currentUser.user._id,
         }),
       });
@@ -202,7 +203,7 @@ export default function CreateListing() {
           <div className="flex gap-6 flex-wrap">
             <div className="flex gap-2">
               <input
-                type="checkbox"
+                type="radio"
                 id="sale"
                 className="w-5"
                 onChange={handleChange}
@@ -212,7 +213,7 @@ export default function CreateListing() {
             </div>
             <div className="flex gap-2">
               <input
-                type="checkbox"
+                type="radio"
                 id="rent"
                 className="w-5"
                 onChange={handleChange}
@@ -334,8 +335,9 @@ export default function CreateListing() {
                 key={`${url}-${index}`}
                 className="flex justify-between items-center p-3 border"
               >
+                {/* Use helper function to ensure consistent URL format */}
                 <img
-                  src={`http://localhost:3000${url}`}
+                  src={getImageUrl(url)}
                   alt={`uploaded-${index}`}
                   className="w-16 h-16 object-cover"
                 />

@@ -34,6 +34,7 @@ export const uploadImages = [
         return res.status(400).json({ error: "No files uploaded" });
       }
 
+      // Use consistent URL format - relative path only
       const imageUrls = req.files.map((file) => `/uploads/${file.filename}`);
       return res.status(200).json({ imageUrls });
     } catch (error) {
@@ -43,30 +44,32 @@ export const uploadImages = [
   },
 ];
 
-// export const createListing = async (req, res, next) => {
-//   try {
-//     const listing = await Listing.create({
-//       ...req.body,
-//       userRef: req.user.id,
-//     });
-//     return res.status(201).json(listing);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 export const createListing = async (req, res, next) => {
   try {
     console.log("Create listing request body:", req.body);
 
-    if (!req.body.userRef) {
-      return res.status(400).json({
-        success: false,
-        message: "User reference (userRef) is required",
+    const userRef = req.user.id;
+
+    let normalizedImageUrls = [];
+    if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
+      normalizedImageUrls = req.body.imageUrls.map(url => {
+        if (url.startsWith('http')) {
+          try {
+            const urlObj = new URL(url);
+            return urlObj.pathname;
+          } catch (e) {
+            return url;
+          }
+        }
+        return url;
       });
     }
 
-    const listing = await Listing.create(req.body);
+    const listing = await Listing.create({
+      ...req.body,
+      imageUrls: normalizedImageUrls,
+      userRef: userRef,
+    });
 
     if (!listing || !listing._id) {
       return res.status(500).json({
@@ -130,6 +133,20 @@ export const updateListing = async (req, res, next) => {
   }
   if (req.user.id !== listing.userRef) {
     return next(errorHandler(401, "You can only update your own listings!"));
+  }
+
+  if (req.body.imageUrls && Array.isArray(req.body.imageUrls)) {
+    req.body.imageUrls = req.body.imageUrls.map(url => {
+      if (url.startsWith('http')) {
+        try {
+          const urlObj = new URL(url);
+          return urlObj.pathname;
+        } catch (e) {
+          return url;
+        }
+      }
+      return url;
+    });
   }
 
   try {

@@ -9,14 +9,11 @@ import {
   FaBath,
   FaBed,
   FaChair,
-  FaMapMarkedAlt,
   FaMapMarkerAlt,
   FaParking,
   FaShare,
 } from "react-icons/fa";
 import Contact from "../components/Contact";
-
-// https://sabe.io/blog/javascript-format-numbers-commas#:~:text=The%20best%20way%20to%20format,format%20the%20number%20with%20commas.
 
 export default function Listing() {
   SwiperCore.use([Navigation]);
@@ -27,6 +24,24 @@ export default function Listing() {
   const [contact, setContact] = useState(false);
   const params = useParams();
   const { currentUser } = useSelector((state) => state.user);
+
+  // Helper function to ensure consistent URL format for images
+  const getImageUrl = (url) => {
+    if (!url) return "";
+
+    // Check if it's already a full URL
+    if (url.startsWith("http")) {
+      return url;
+    }
+
+    // Handle URLs starting with /uploads/
+    if (url.startsWith("/uploads/")) {
+      return `http://localhost:3000${url}`;
+    }
+
+    // If it's neither, return the URL as is (fallback)
+    return url;
+  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -39,10 +54,14 @@ export default function Listing() {
           setLoading(false);
           return;
         }
+
+        console.log("Fetched listing data:", data);
+
         setListing(data);
         setLoading(false);
         setError(false);
       } catch (error) {
+        console.error("Error fetching listing:", error);
         setError(true);
         setLoading(false);
       }
@@ -50,28 +69,52 @@ export default function Listing() {
     fetchListing();
   }, [params.listingId]);
 
+  // Function to handle if image fails to load
+  const handleImageError = (e) => {
+    console.error("Image failed to load:", e.target.src);
+    e.target.src = "https://placehold.co/600x400?text=No+Image";
+  };
+
   return (
-    <main>
+    <main className="max-w-6xl mx-auto p-3">
       {loading && <p className="text-center my-7 text-2xl">Loading...</p>}
       {error && (
         <p className="text-center my-7 text-2xl">Something went wrong!</p>
       )}
       {listing && !loading && !error && (
         <div>
-          <Swiper navigation>
-            {listing.imageUrls.map((url) => (
-              <SwiperSlide key={url}>
-                <div
-                  className="h-[550px]"
-                  style={{
-                    background: `url(${url}) center no-repeat`,
-                    backgroundSize: "cover",
-                  }}
-                ></div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          <div className="fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer">
+          {/* Image Carousel */}
+          <div className="mt-6 mb-8">
+            <Swiper
+              navigation
+              className="rounded-lg overflow-hidden shadow-md"
+              slidesPerView={1}
+            >
+              {listing.imageUrls && listing.imageUrls.length > 0 ? (
+                listing.imageUrls.map((url, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="relative flex justify-center bg-gray-200">
+                      <img
+                        src={getImageUrl(url)}
+                        alt={`Property ${index + 1}`}
+                        className="max-h-[400px] object-contain"
+                        onError={handleImageError}
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))
+              ) : (
+                <SwiperSlide>
+                  <div className="h-[400px] flex items-center justify-center bg-gray-200">
+                    <p className="text-xl text-gray-500">No images available</p>
+                  </div>
+                </SwiperSlide>
+              )}
+            </Swiper>
+          </div>
+
+          {/* Share Button */}
+          <div className="fixed top-[10%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-white shadow-md cursor-pointer">
             <FaShare
               className="text-slate-500"
               onClick={() => {
@@ -83,52 +126,83 @@ export default function Listing() {
               }}
             />
           </div>
+          {copied && (
+            <p className="fixed top-[16%] right-[3%] z-10 rounded-md bg-white p-2 shadow-md">
+              Link copied!
+            </p>
+          )}
 
-          <div className="flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4">
-            <p className="flex items-center mt-6 gap-2 text-slate-600">
+          {/* Listing Details */}
+          <div className="flex flex-col gap-4 bg-white rounded-lg p-6 shadow-sm">
+            <h1 className="text-2xl font-semibold border-b pb-2">
+              {listing.name}
+              {listing.regularPrice ? (
+                <span className="text-xl text-gray-600 ml-2">
+                  ${listing.regularPrice}
+                  {listing.type === "rent" && " / month"}
+                </span>
+              ) : null}
+            </h1>
+
+            <p className="flex items-center gap-2 text-gray-600">
               <FaMapMarkerAlt className="text-green-700" />
               {listing.address}
             </p>
-            <div className="flex gap-4">
-              <p className="bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
+
+            <div className="flex gap-3 my-2">
+              <span className="bg-red-800 text-white px-4 py-1 rounded-md text-sm">
                 {listing.type === "rent" ? "For Rent" : "For Sale"}
-              </p>
+              </span>
+              <span
+                className={`px-4 py-1 rounded-md text-sm text-white ${
+                  listing.status === "active" ? "bg-green-700" : "bg-yellow-600"
+                }`}
+              >
+                {listing.status === "active" ? "Active" : "Pending"}
+              </span>
             </div>
-            <p className="text-slate-800">
-              <span className="font-semibold text-black">Description - </span>
-              {listing.description}
-            </p>
-            <ul className="text-green-900 font-semibold text-sm flex flex-wrap items-center gap-4">
-              <li className="flex items-center gap-1 whitespace-nowrap ">
-                <FaBed className="text-lg" />
-                {listing.bedrooms > 1
-                  ? `${listing.bedrooms} beds `
-                  : `${listing.bedrooms} bed `}
+
+            <div className="mt-2">
+              <h3 className="font-semibold text-gray-800">Description</h3>
+              <p className="text-gray-700 mt-1">{listing.description}</p>
+            </div>
+
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 bg-gray-50 p-4 rounded-lg">
+              <li className="flex items-center gap-2">
+                <FaBed className="text-lg text-green-700" />
+                <span>
+                  {listing.bedrooms} {listing.bedrooms > 1 ? "beds" : "bed"}
+                </span>
               </li>
-              <li className="flex items-center gap-1 whitespace-nowrap ">
-                <FaBath className="text-lg" />
-                {listing.bathrooms > 1
-                  ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms} bath `}
+              <li className="flex items-center gap-2">
+                <FaBath className="text-lg text-green-700" />
+                <span>
+                  {listing.bathrooms} {listing.bathrooms > 1 ? "baths" : "bath"}
+                </span>
               </li>
-              <li className="flex items-center gap-1 whitespace-nowrap ">
-                <FaParking className="text-lg" />
-                {listing.parking ? "Parking spot" : "No Parking"}
+              <li className="flex items-center gap-2">
+                <FaParking className="text-lg text-green-700" />
+                <span>{listing.parking ? "Parking spot" : "No Parking"}</span>
               </li>
-              <li className="flex items-center gap-1 whitespace-nowrap ">
-                <FaChair className="text-lg" />
-                {listing.furnished ? "Furnished" : "Unfurnished"}
+              <li className="flex items-center gap-2">
+                <FaChair className="text-lg text-green-700" />
+                <span>{listing.furnished ? "Furnished" : "Unfurnished"}</span>
               </li>
             </ul>
-            {currentUser && listing.userRef !== currentUser._id && !contact && (
-              <button
-                onClick={() => setContact(true)}
-                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
-              >
-                Contact landlord
-              </button>
-            )}
-            {contact && <Contact listing={listing} />}
+
+            {currentUser &&
+              currentUser.user &&
+              listing.userRef !== currentUser.user._id &&
+              !contact && (
+                <button
+                  onClick={() => setContact(true)}
+                  className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-4 w-full md:w-auto md:min-w-[200px]"
+                >
+                  Contact landlord
+                </button>
+              )}
+
+            {contact && <Contact listing={listing} className="mt-4" />}
           </div>
         </div>
       )}
